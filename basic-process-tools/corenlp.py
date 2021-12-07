@@ -126,7 +126,7 @@ class StanfordCoreNLP:
             trial += 1
             time.sleep(1)
         logging.info('The server is available.')
-        
+
     def __enter__(self):
         return self
 
@@ -155,7 +155,7 @@ class StanfordCoreNLP:
             logging.info('Killing shell pid: {}, cmdline: {}'.format(parent.pid, parent.cmdline()))
             # parent.send_signal(signal.SIGTERM)
             parent.kill()
-    
+
     def annotate(self, text, properties=None):
         if sys.version_info.major >= 3:
             text = text.encode('utf-8')
@@ -180,7 +180,7 @@ class StanfordCoreNLP:
         return r_dict
 
     def word_tokenize(self, sentence, span=False):
-        r_dict = self._request('ssplit,tokenize', sentence)
+        r_dict = self._request(self.url, 'ssplit,tokenize', sentence)
         tokens = [token['originalText'] for s in r_dict['sentences'] for token in s['tokens']]
 
         # Whether return token span
@@ -221,7 +221,7 @@ class StanfordCoreNLP:
                 s['basicDependencies']]
 
     def coref(self, text):
-        r_dict = self._request('coref', text)
+        r_dict = self._request(self.url, 'coref', text)
 
         corefs = []
         for k, mentions in r_dict['corefs'].items():
@@ -254,6 +254,7 @@ class StanfordCoreNLP:
         self._check_language(self.lang)
         if not re.match('\dg', self.memory):
             raise ValueError('memory=' + self.memory + ' not supported. Use 4g, 6g, 8g and etc. ')
+
 
     def _check_language(self, lang):
         if lang not in ['en', 'zh', 'ar', 'fr', 'de', 'es', 'hu', 'it']:
